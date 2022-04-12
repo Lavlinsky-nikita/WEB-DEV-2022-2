@@ -32,6 +32,7 @@ def generate_post(i):
         'comments': generate_comments()
     }
 
+
 posts_list = sorted([generate_post(i) for i in range(5)], key=lambda p: p['date'], reverse=True)
 
 @app.route('/')
