@@ -1,15 +1,22 @@
 from flask import Flask, render_template, session, request, redirect, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
- 
+from mysql_db import MySQL
+
+
 login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.login_message = 'Для доступа к данной страницк необходимо пройти процедуру аутентификации.'
 login_manager.login_message_category = 'warning'
 
+
 app = Flask(__name__)
 application = app
 
 login_manager.init_app(app)
+
+app.config.from_pyfile('config.py')
+
+mysql = MySQL(app)
 
 class User(UserMixin):
     def __init__(self, user_id, login, password):
@@ -19,8 +26,12 @@ class User(UserMixin):
         self.password = password
 
 
+
 @login_manager.user_loader
 def load_user(user_id):
+    with mysql.connection.cursor() as cursor:
+        cursor.execute('SELECT * FROM users WHERE id=%s' , (user_id))
+        cursor.fetchone()
     for user in get_users():
         if user['user_id']==user_id:
             return User(**user)
@@ -35,13 +46,7 @@ def get_users():
 def index():
     return render_template('index.html')
 
-@app.route('/visits')
-def visits():
-    if session.get('visits_count') is None:
-        session['visits_count'] = 1
-    else:
-        session['visits_count'] += 1
-    return render_template('visits.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -63,7 +68,3 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-@app.route('/secret_page')
-@login_required
-def secret_page():
-    return redirect(url_for('secret_page'))
