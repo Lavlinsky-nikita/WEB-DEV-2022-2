@@ -52,10 +52,10 @@ def login():
         for user in get_users():
             if user['login'] == login_ and user['password'] == password:
                 login_user(User(**user), remember=remember_me)
-                falsh('Вы успешно прошли процедуру аутентификации.', 'success')
+                flash('Вы успешно прошли процедуру аутентификации.', 'success')
                 next_ = request.args.get('next')
-                return redirect(url_for('index', message=''))
-        falsh('Введенны неверные логин и/или пароль.', 'danger')
+                return redirect(next_ or url_for('index'))
+        flash('Введенны неверные логин и/или пароль.', 'danger')
     return render_template('login.html')
 
 @app.route('/logout')
@@ -66,4 +66,4 @@ def logout():
 @app.route('/secret_page')
 @login_required
 def secret_page():
-    return redirect(url_for('secret_page'))
+    return render_template('secret_page.html')
