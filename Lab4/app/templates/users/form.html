@@ -1,0 +1,42 @@
+<!-- макрос - элемент используемый на нескольких страницах-->
+<!--  -->
+{% macro render_user_form(url, user={}) %}
+
+<!-- action-адрес куда будет отправлять данные формы -->
+    <form action="{{ url }}" method="POST" style="max-width: 40rem;">
+        <div class="row mb-3">
+            <label for="login" class="col-sm-2 col-form-label">Логин</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" name="login" id="login">
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label for="password" class="col-sm-2 col-form-label">Пароль</label>
+            <div class="col-sm-10">
+              <input type="password" class="form-control" name="password" id="password">
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label for="last_name" class="col-sm-2 col-form-label">Фамилия</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" name="last_name" id="last_name">
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label for="first_name" class="col-sm-2 col-form-label">Имя</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" name="first_name" id="first_name">
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label for="middle_name" class="col-sm-2 col-form-label">Отчество</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" name="middle_name" id="middle_name">
+            </div>
+        </div>
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </div>
+    </form>
+
+{% endmacro %}
