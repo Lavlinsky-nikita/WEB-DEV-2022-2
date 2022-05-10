@@ -3,7 +3,7 @@ from click import password_option
 from flask import Flask, render_template, session, request, redirect, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
 from mysql_db import MySQL
-
+import mysql.connector as connector
 
 login_manager = LoginManager()
 login_manager.login_view = 'login'
@@ -26,8 +26,8 @@ CREATE_PARAMS = ['login','password','first_name','last_name','middle_name']
 def request_params(params_list):
     params ={}
     for param_name in params_list:
-        # get чтобы невернул ошибку если такого параметра нет
-        params[param_name]=request.form.get(param_name)
+        # get чтобы невернул ошибку если такого параметра нет, or None чтобы пустые значения заменялись на None
+        params[param_name]=request.form.get(param_name) or None
     return params
 
 class User(UserMixin):
@@ -88,19 +88,24 @@ def users():
 @app.route('/users/new')
 @login_required
 def new():
-    return render_template('users/new.html')
+    return render_template('users/new.html', user={})
 
 @app.route('/users/create', methods=['POST'])
 @login_required
 def create():
     params = request_params(CREATE_PARAMS)
     with mysql.connection.cursor(named_tuple=True) as cursor:
-        cursor.execute(
-            ('INSERT INTO users (login, password_hash, last_name, first_name, middle_name)'
-            'VALUES (%(login)s, SHA2(%(password)s, 256), %(last_name)s, %(first_name)s, %(middle_name)s);'),
-            params
-        )
-        # Закомитили транзакцию
-        mysql.connection.commit()
+        try:
+            cursor.execute(
+                ('INSERT INTO users (login, password_hash, last_name, first_name, middle_name)'
+                'VALUES (%(login)s, SHA2(%(password)s, 256), %(last_name)s, %(first_name)s, %(middle_name)s);'),
+                params
+            )
+            # Закомитили транзакцию
+            mysql.connection.commit()
+       # Перехват ошибок типа 
+        except connector.Error:
+            flash('Введены некорректные данные. Ошибка сохранения', 'danger')
+            return render_template('users/new.html', user=params)
     flash(f"Пользователь {params.get('login')} был успешно создан!", 'success')
     return redirect(url_for('users'))
