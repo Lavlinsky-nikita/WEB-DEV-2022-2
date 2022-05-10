@@ -21,7 +21,7 @@ app.config.from_pyfile('config.py')
 mysql = MySQL(app)
 
 # Параметры которые необходимо извлекать из запроса при создании пользователя 
-CREATE_PARAMS = ['login','password','first_name','last_name','middle_name']
+CREATE_PARAMS = ['login','password','first_name','last_name','middle_name', 'role_id']
 
 def request_params(params_list):
     params ={}
@@ -29,6 +29,12 @@ def request_params(params_list):
         # get чтобы невернул ошибку если такого параметра нет, or None чтобы пустые значения заменялись на None
         params[param_name]=request.form.get(param_name) or None
     return params
+
+def load_roles():
+    with mysql.connection.cursor(named_tuple=True) as cursor:
+        cursor.execute('SELECT id, name FROM roles;')
+        roles = cursor.fetchall()
+    return roles
 
 class User(UserMixin):
     def __init__(self, user_id, login):
@@ -88,7 +94,7 @@ def users():
 @app.route('/users/new')
 @login_required
 def new():
-    return render_template('users/new.html', user={})
+    return render_template('users/new.html', user={}, roles=load_roles())
 
 @app.route('/users/create', methods=['POST'])
 @login_required
@@ -97,8 +103,8 @@ def create():
     with mysql.connection.cursor(named_tuple=True) as cursor:
         try:
             cursor.execute(
-                ('INSERT INTO users (login, password_hash, last_name, first_name, middle_name)'
-                'VALUES (%(login)s, SHA2(%(password)s, 256), %(last_name)s, %(first_name)s, %(middle_name)s);'),
+                ('INSERT INTO users (login, password_hash, last_name, first_name, middle_name, role_id)'
+                'VALUES (%(login)s, SHA2(%(password)s, 256), %(last_name)s, %(first_name)s, %(middle_name)s), %(role_id)s);'),
                 params
             )
             # Закомитили транзакцию
@@ -106,6 +112,9 @@ def create():
        # Перехват ошибок типа 
         except connector.Error:
             flash('Введены некорректные данные. Ошибка сохранения', 'danger')
-            return render_template('users/new.html', user=params)
+            return render_template('users/new.html', 
+                                    user=params,
+                                    roles=load_roles())
     flash(f"Пользователь {params.get('login')} был успешно создан!", 'success')
     return redirect(url_for('users'))
+
