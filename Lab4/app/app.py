@@ -104,7 +104,7 @@ def create():
         try:
             cursor.execute(
                 ('INSERT INTO users (login, password_hash, last_name, first_name, middle_name, role_id)'
-                'VALUES (%(login)s, SHA2(%(password)s, 256), %(last_name)s, %(first_name)s, %(middle_name)s), %(role_id)s);'),
+                'VALUES (%(login)s, SHA2(%(password)s, 256), %(last_name)s, %(first_name)s, %(middle_name)s, %(role_id)s);'),
                 params
             )
             # Закомитили транзакцию
