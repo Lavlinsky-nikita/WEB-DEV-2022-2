@@ -1,8 +1,5 @@
-from locale import currency
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from importlib_metadata import method_cache
-from numpy import record
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required,  current_user 
 from app import mysql, app
 from users_policy import UserPolicy
 import functools 
@@ -32,7 +29,7 @@ def chech_rights(action):
     def decorator(func):
         @functools.wraps(func) 
         def wrapper(*args, **kwargs):
-            user= load_user(kwargs.get('user_id'))
+            user = load_user(kwargs.get('user_id'))
             if not current_user.can(action, record=user):
                 flash('У вас недостаточно прав для доступа к данной странице.', 'danger')
                 return redirect(url_for('index'))
