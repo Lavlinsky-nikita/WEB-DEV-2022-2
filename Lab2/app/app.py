@@ -18,6 +18,7 @@ def args():
 def headers():
     return render_template('headers.html')
 
+#make_response - Преобразуйте возвращаемое значение из функции представления в экземпляр
 @app.route('/cookies')
 def cookies():
     response = make_response(render_template('cookies.html'))

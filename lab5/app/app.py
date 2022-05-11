@@ -1,7 +1,7 @@
 
 from click import password_option
 from flask import Flask, render_template, session, request, redirect, url_for, flash
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from mysql_db import MySQL
 import mysql.connector as connector
 
@@ -99,15 +99,18 @@ def edit(user_id):
 
 @app.route('/users/<int:user_id>/update', methods=['POST'])
 @login_required
+@chech_rights('update')
 def update(user_id):
     params = request_params(UPDATE_PARAMS)
     params['role_id'] = int(params['role_id']) if params['role_id'] else None
     params['id'] = user_id
+    if not current_user.can('assign_role'):
+        del params['role_id']
     with mysql.connection.cursor(named_tuple=True) as cursor:
         try: 
-            cursor.execute(
-                ('UPDATE users SET last_name=%(last_name)s, first_name=%(first_name)s, ' 
-                'middle_name=%(middle_name)s, role_id=%(role_id)s WHERE id = %(id)s;'), params)
+            cursor.execute((
+                f"UPDATE users SET {', '.join(['{0}=%({0})s'.format(k) for k, _ in params.items() if k != 'id'])} " 
+                'WHERE id = %(id)s;'), params)
             mysql.connection.commit()
         except connector.Error:
             flash('Введены некорректные данные. Ошибка сохранения', 'danger')
