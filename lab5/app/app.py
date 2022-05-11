@@ -5,16 +5,8 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from mysql_db import MySQL
 import mysql.connector as connector
 
-login_manager = LoginManager()
-login_manager.login_view = 'login'
-login_manager.login_message = 'Для доступа к данной страницк необходимо пройти процедуру аутентификации.'
-login_manager.login_message_category = 'warning'
-
-
 app = Flask(__name__)
 application = app
-
-login_manager.init_app(app)
 
 app.config.from_pyfile('config.py')
 
@@ -22,7 +14,14 @@ mysql = MySQL(app)
 
 # Параметры которые необходимо извлекать из запроса при создании пользователя 
 CREATE_PARAMS = ['login','password','first_name','last_name','middle_name', 'role_id']
+
 UPDATE_PARAMS = ['first_name', 'last_name', 'middle_name', 'role_id']
+
+# Импорт здесь должен быть после mysql = MySQL(app)
+from auth import init_login_manager, bp as auth_bp, chech_rights
+
+init_login_manager(app)
+app.register_blueprint(auth_bp)
 
 def request_params(params_list):
     params ={}
@@ -37,53 +36,9 @@ def load_roles():
         roles = cursor.fetchall()
     return roles
 
-class User(UserMixin):
-    def __init__(self, user_id, login):
-        super().__init__()
-        self.id = user_id
-        self.login = login
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    with mysql.connection.cursor(named_tuple=True) as cursor:
-        cursor.execute('SELECT * FROM users WHERE id=%s;', (user_id,))
-        db_user=cursor.fetchone()
-    if db_user:
-        return User(user_id=db_user.id, login=db_user.login) 
-    return None
-
-
 @app.route('/')
 def index():
     return render_template('index.html')
-
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        login_ = request.form.get('login')
-        password = request.form.get('password')
-        remember_me = request.form.get('remember_me') == 'on'
-        with mysql.connection.cursor(named_tuple=True) as cursor:
-            cursor.execute(
-                'SELECT * FROM users WHERE login=%s AND password_hash=SHA2(%s, 256);', 
-                (login_, password))
-            db_user=cursor.fetchone()
-        if db_user:
-            login_user(User(user_id=db_user.id, login=db_user.login),
-                        remember=remember_me)
-            flash('Вы успешно прошли процедуру аутентификации.', 'success')
-            next_ = request.args.get('next')
-            return redirect(next_ or url_for('index'))
-        flash('Введенны неверные логин и/или пароль.', 'danger')
-    return render_template('login.html')
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
 
 @app.route('/users')
 def users():
@@ -95,11 +50,13 @@ def users():
 
 @app.route('/users/new')
 @login_required
+@chech_rights('create')
 def new():
     return render_template('users/new.html', user={}, roles=load_roles())
 
 @app.route('/users/create', methods=['POST'])
 @login_required
+@chech_rights('create')
 def create():
     params = request_params(CREATE_PARAMS)
     params['role_id'] = int(params['role_id']) if params['role_id'] else None
@@ -123,6 +80,8 @@ def create():
 
 # передаем индефикатор как часть урла, подставляться в user_id и обязательно int
 @app.route('/users/<int:user_id>')
+@login_required
+@chech_rights('show')
 def show(user_id):
     with mysql.connection.cursor(named_tuple=True) as cursor:
         cursor.execute('SELECT * FROM users WHERE id=%s;', (user_id,))
@@ -131,6 +90,7 @@ def show(user_id):
 
 @app.route('/users/<int:user_id>/edit')
 @login_required
+@chech_rights('update')
 def edit(user_id):
     with mysql.connection.cursor(named_tuple=True) as cursor:
         cursor.execute('SELECT * FROM users WHERE id=%s;', (user_id,))
@@ -157,6 +117,7 @@ def update(user_id):
 
 @app.route('/users/<int:user_id>/delete', methods=['POST'])
 @login_required
+@chech_rights('delete')
 def delete(user_id):
     with mysql.connection.cursor(named_tuple=True) as cursor:
         try: 
