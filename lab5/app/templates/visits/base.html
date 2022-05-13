@@ -1,0 +1,26 @@
+<!-- Наследуем от базового шаблона приложения путь относительно директории templates  -->
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1 class="my-3 text-center">Статистика действий пользователей</h1>
+
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link {% if request.endpoin == 'visits.logs' %}active{% endif %}" aria-current="page" href="{{ url_for('visits.logs') }}">Журнал посещений</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#">Статистика по страницам</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#">Cтатистика по пользователям</a>
+    </li>
+</ul>
+
+<div class="mt-5">
+    {% block tab_content %}
+
+    {% endblock %}  
+</div>
+
+{% endblock %}

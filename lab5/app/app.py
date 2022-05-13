@@ -12,16 +12,46 @@ app.config.from_pyfile('config.py')
 
 mysql = MySQL(app)
 
+# Импорт здесь должен быть после mysql = MySQL(app)
+from auth import init_login_manager, bp as auth_bp, chech_rights
+
+from visits import bp as visits_bp
+
+
+init_login_manager(app)
+app.register_blueprint(auth_bp)
+app.register_blueprint(visits_bp)
+
+
 # Параметры которые необходимо извлекать из запроса при создании пользователя 
 CREATE_PARAMS = ['login','password','first_name','last_name','middle_name', 'role_id']
 
 UPDATE_PARAMS = ['first_name', 'last_name', 'middle_name', 'role_id']
 
-# Импорт здесь должен быть после mysql = MySQL(app)
-from auth import init_login_manager, bp as auth_bp, chech_rights
 
-init_login_manager(app)
-app.register_blueprint(auth_bp)
+# сохранение данных о посещении пользователя страницы
+# request.path - путь до станицы, все что идет после / и не включая параметры url
+# before_request - запускаем когда приложение поступаем запрос от пользователя
+# Вызывает перед обработкой каждого запроса, не изменяет функцию, а записывает что нужно вызывать эту функцию
+@app.before_request
+def log_visit_info():
+    # Чтобы запросы на статику не попадали в логи 
+    if request.endpoint == 'static':
+        return None
+    # если залогиненный пользователь тогда используем current_user
+    # gettattr -  ,current_user-объект, id атребут который берем, None-если атрибута нет
+    user_id = getattr(current_user, 'id', None)
+    # Запрос, path - путь до станицы, все что идет после / и не включая параметры url
+    # и (%s, %s) - куда подставляем эти значения
+    query = 'INSERT INTO visit_logs (user_id, path) VALUES (%s, %s);'
+    # выполняем запрос
+    with mysql.connection.cursor(named_tuple=True) as cursor:
+        try:
+            cursor.execute(query, (user_id, request.path))
+            # Комит чтобы транзакция закомитилась 
+            mysql.connection.commit()
+        except:
+            pass
 
 def request_params(params_list):
     params ={}
