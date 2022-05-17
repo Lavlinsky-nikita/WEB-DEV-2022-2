@@ -36,7 +36,7 @@ UPDATE_PARAMS = ['first_name', 'last_name', 'middle_name', 'role_id']
 @app.before_request
 def log_visit_info():
     # Чтобы запросы на статику не попадали в логи 
-    if request.endpoint == 'static':
+    if request.endpoint == 'static' or request.args.get('download_csv'):
         return None
     # если залогиненный пользователь тогда используем current_user
     # gettattr -  ,current_user-объект, id атребут который берем, None-если атрибута нет

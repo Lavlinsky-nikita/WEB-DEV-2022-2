@@ -1,18 +1,16 @@
 {% extends 'visits/base.html' %}
-{% from 'pagination.html' import render_pagination %}
 
-<!-- Содержимое первой вкладки  -->
+
 {% block tab_content %}
 
-<h2>Журнал посежений</h2>
+<h2>Статистика по пользователям</h2>
 
 <table class="table">
     <thead>
         <tr>
             <th>№</th>
             <th>Пользователь</th>
-            <th>Страница</th>
-            <th>Дата</th>
+            <th>Количество посещений</th>
         </tr>
     </thead>
 
@@ -21,20 +19,18 @@
             <tr>
                 <td>{{ loop.index }}</td>
                 <td>
-                    {% if record.user_id %}
+                    {% if record.last_name %}
                         {{ record.last_name }} {{ record.first_name }} {{ record.middle_name or '' }}
                     {% else %}
                         Неаутентифицированный пользователь
                     {% endif %}
                 </td>
-                <td>{{ record.path }}</td>
-                <!-- strftime метод преобразование даты и времени -->
-                <td>{{ record.created_at.strftime('%d.%m.%Y %H:%M:%S') }}</td>
+                <td>{{ record.count }}</td>
             </tr>
         {% endfor %}
     </tbody>
 </table>
 
-{{ render_pagination(request.endpoint, page, total_pages) }}
+<a class="btn btn-primary" href="{{ url_for('visits.users_stat', download_csv='True') }}">Экспорт в CSV</a>
 
 {% endblock %}
