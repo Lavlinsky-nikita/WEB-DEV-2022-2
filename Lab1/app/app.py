@@ -4,6 +4,11 @@ from faker import Faker
 
 fake = Faker()
 
+# WSGI - стандарт взаимодействия между веб приложение и веб сервером
+
+
+# объект класса, name - принимает значение main, если запускаем файл, если импортируем - значение будет название модуля  
+# Используется во фласке, чтобы определить откуда загружать другие файлы (шаблоны)
 app = Flask(__name__)
 application = app
 
@@ -35,6 +40,8 @@ def generate_post(i):
 
 posts_list = sorted([generate_post(i) for i in range(5)], key=lambda p: p['date'], reverse=True)
 
+# @app.route('/') - декаратор с методом роут принимает шаблон пути 
+# index() -  view function? обработчик которая обрабатывает запрос, поторый поступил, хранятся в app 
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -43,6 +50,7 @@ def index():
 def posts():
     return render_template('posts.html', title='Посты', posts=posts_list)
 
+# Передаем параметры как часть url, int - конвертор
 @app.route('/posts/<int:index>')
 def post(index):
     p = posts_list[index]
@@ -51,3 +59,9 @@ def post(index):
 @app.route('/about')
 def about():
     return render_template('about.html', title='Об авторе')
+
+# {{ }} - подстановка значения, которое мы передали -->
+# {% block content %}  {% endblock %} - содержимое, которое можно переопределить на конкретной странице, в потомках доступно содержимое блоко по умочанию, у блоков должно быть уникальное название   
+# {% extends 'base.html' %} - наследование и название шаблона
+# {{ }} - выражения значение которых, подставляется в итоговый документ, видны на странице 
+# Чтобы передать значения в шаблон мы их передаем в качестве параметров в  render_template

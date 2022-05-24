@@ -11,6 +11,7 @@
             </tr>
         </thead>
         <tbody>
+            <!-- args - словарь, items - вернет пару: ключ значение -->
             {% for name, value in request.args.items() %}
             <tr>
                 <td>{{ name }}</td>
