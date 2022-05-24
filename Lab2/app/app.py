@@ -88,7 +88,7 @@ def form():
         if context:
             return render_template('form.html', context=context )
         else:
-            return number
+            return render_template('form.html', number=number)
     return render_template('form.html')
 
 
