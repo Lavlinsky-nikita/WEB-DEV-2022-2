@@ -86,5 +86,4 @@ def users_stat():
 
 @bp.route('/stats/pages')
 def pages_stat():
-    records=[]
-    render_template('visits/pages_stat.html', records=records)
+    render_template('visits/pages_stat.html')

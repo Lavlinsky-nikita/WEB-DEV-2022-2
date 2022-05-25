@@ -64,7 +64,9 @@ oct1, oct2, oct3, oct4 = [
 
 
 bin_ip_str="{:08b}{:08b}{:08b}{:08b}".format(oct1, oct2, oct3, oct4)
+# Получаем адрес сети
 bin_network_str = bin_ip_str[:mask] + "0" * (32 - mask)
+
 
 
 net1, net2, net3, net4 = [
@@ -73,7 +75,7 @@ net1, net2, net3, net4 = [
     int(bin_network_str[16:24], 2),
     int(bin_network_str[24:32], 2),
 ]
-
+# Маска
 bin_mask = "1" * mask + "0" * (32 - mask)
 m1, m2, m3, m4 = [
     int(bin_mask[0:8], 2),

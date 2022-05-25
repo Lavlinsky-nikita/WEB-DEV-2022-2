@@ -26,8 +26,13 @@
 """
 
 ip = "192.168.3.1"
+# Разделили по точке
 ip_split = ip.split(".")
-template_up = '''{0:<10} {1:<10} {2:<10} {3:<10}'''
+
+# Сделали шаблоны для вывода
+# И добавили условие что максимум символов мельше 10 
+template_up = '''{0:<8} {1:<8} {2:<8} {3:<8}'''
+# Вместо 0-пробелы, 8-ширина столбца, b-двоичный формат
 template_down = '''{0:08b} {1:08b} {2:08b} {3:08b}'''
 print(template_up.format(ip_split[0],ip_split[1],ip_split[2],ip_split[3]))
 print(template_down.format(int(ip_split[0]),int(ip_split[1]),int(ip_split[2]),int(ip_split[3])))

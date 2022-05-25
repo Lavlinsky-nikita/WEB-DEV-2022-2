@@ -53,5 +53,5 @@ london_co = {
 device = input("Введите имя устройства: ")
 choice = ", ".join(london_co[device].keys())
 parameter = input(f"Введите имя параметра ({choice}): ")
-
+# get запрашивает ключ и если его нет возвращает None или значение которое мы укажем через,
 print(london_co[device].get(parameter, "Такого параметра нет"))

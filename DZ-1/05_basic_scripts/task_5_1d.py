@@ -46,5 +46,5 @@ london_co = {
 device = input("Введите имя устройства: ")
 choice = ", ".join(london_co[device].keys())
 parameter = input(f"Введите имя параметра ({choice}): ")
-
+# lower - преобразует строку к нижнему регистру
 print(london_co[device].get(parameter.lower(), "Такого параметра нет"))

@@ -16,8 +16,13 @@
 """
 
 mac = "AAAA:BBBB:CCCC"
-mac_list = mac.split(":")
+# разделяем по :
+mac_list = mac.split(':')
+# склеили адрес в одну сроку
 mac_string = mac_list[0] + mac_list[1] +mac_list[2]
+# перевели число из 16 в 10 СС
 mac_hex = int(mac_string, 16)
+# перевели в бинарный вид и убрали 0b
 mac_din = (bin(mac_hex)).strip('0b')   
 print(mac_din)
+# print(mac_din)

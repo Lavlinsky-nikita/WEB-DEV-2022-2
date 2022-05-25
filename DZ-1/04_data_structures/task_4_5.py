@@ -22,10 +22,15 @@
 
 command1 = "switchport trunk allowed vlan 1,2,3,5,8"
 command2 = "switchport trunk allowed vlan 1,3,8,9"
+# Разделяем списки по пробелу
 config1 = command1.split()
 config2 = command2.split()
+# Последний элемент разделяем по ,
 vlans1 = config1[-1].split(',')
 vlans2 = config2[-1].split(',')
-result = list(set(vlans1) & set(vlans2))
 
-print(list(set(vlans1) & set(vlans2)))
+# set - убирает повторяющиеся элементы
+# Выполняем побитову конюкцию 
+# Приводим к списку
+result = list(set(vlans1) & set(vlans2))
+print(result)

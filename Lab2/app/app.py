@@ -2,12 +2,14 @@ from unittest import result
 from urllib import response
 from flask import Flask, render_template, request, make_response
 
+# Значение request определяется текущим контекстом запроса, для каждого потока он свой, можем получить доступ к данным которые доступны в запросе
+# В шаблоне доступен по умолчанию(его не нужно передавать)
 
 app = Flask(__name__)
 application = app
 
 
-
+# К объекту запроса можем обратиться только в контексте запроса (Запрос будет когда будет вызываться функция обработчик)
 @app.route('/')
 def index():
     url = request.url
@@ -24,18 +26,28 @@ def headers():
     return render_template('headers.html')
 
 
+
+# Кроме тела ответа может передаваться служебная информация с помощью
+
+# Чтобы сделать новое значение cookies - у ответа есть заголовки в которых мы можем что-то передать 
+# Чтобы установить свой заголовок нужен объект ответа, чтобы его получить используем make_response
+# make_response - Преобразуйте возвращаемое значение из функции представления в экземпляр
+# И вместо render_template возвращаем make_response
+
 # cookies - словарь
 # Путь по умолчанию проставляется для всего домена, чтобы задать конкретный путь (path)
 # Будет ли доступен cookie, через защищенный соединение или нет (secure)
 # Доступ к cookies не доступен для скрипта, доступ только у сервера(httpoly)
 # Нужно ли отправлять cookies если запрос был с другово домена(samesite)
+# Для кокого поддемена будут доступны cookies (domain)
+# 
 
-#make_response - Преобразуйте возвращаемое значение из функции представления в экземпляр
+
 @app.route('/cookies')
 def cookies():
     # make_response - принимает строку с телом ответа
     response = make_response(render_template('cookies.html'))
-    # set_cookie - добавляет cookie
+    # set_cookie - добавляет cookie (первый агрумент название, второго значение)
     if request.cookies.get('name') is None:
         response.set_cookie('name', 'qq')
     else:
@@ -92,5 +104,4 @@ def form():
     return render_template('form.html')
 
 
-# Значение request определяется текущим контекстом запроса, для каждого потока он свой
   

@@ -15,5 +15,6 @@
 
 """
 
+#  replace - Возвращает копию строки, в которой заменены все вхождения указанной строки указанным значением
 nat = "ip nat inside source list ACL interface FastEthernet0/1 overload"
 print(nat.replace('Fast', 'Gigabit'))

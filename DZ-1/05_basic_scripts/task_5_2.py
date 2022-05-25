@@ -32,18 +32,21 @@ Out[1]: '11111111111111111111111111110000'
 """
 
 network = input("Введите адрес сети: ")
-
+# в ip что до / в mask что после /
 ip, mask = network.split("/")
+# Разделяем ip по точке (4 шт)
 ip_list = ip.split(".")
+# Преобразуем маску в Int, (была str)
 mask = int(mask)
 
+# Записываем в октеты
 oct1, oct2, oct3, oct4 = [
     int(ip_list[0]),
     int(ip_list[1]),
     int(ip_list[2]),
     int(ip_list[3]),
 ]
-
+# Создаем бинарную маску
 bin_mask = "1" * mask + "0" * (32 - mask)
 m1, m2, m3, m4 = [
     int(bin_mask[0:8], 2),
@@ -51,7 +54,7 @@ m1, m2, m3, m4 = [
     int(bin_mask[16:24], 2),
     int(bin_mask[24:32], 2),
 ]
-
+# Создаем шаблоны для форматированного вывода
 ip_output = """
 Network:
 {0:<8}  {1:<8}  {2:<8}  {3:<8}

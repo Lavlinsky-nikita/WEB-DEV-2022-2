@@ -14,6 +14,8 @@ MAC-адреса используются в формате XXXX.XXXX.XXXX
 
 mac = ["aabb:cc80:7000", "aabb:dd80:7340", "aabb:ee80:7000", "aabb:ff80:7000"]
 result = []
+# Берем каждый элемент из mac заменяем : на . c помощью replace 
+# и добавляем в новый список с помощь append
 for m in mac:
     result.append(m.replace(":", "."))
 print(result)

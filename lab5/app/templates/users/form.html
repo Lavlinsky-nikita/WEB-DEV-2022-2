@@ -38,7 +38,7 @@
         </div>
         
         <!-- Запрещаем изменять роль пользователю, -->
-        {% if current_user.can('assign_role') or true %}
+        {% if current_user.can('assign_role') %}
         <div class="row mb-3">
           <label for="role_id" class="col-sm-2 col-form-label">Роль</label>
           <div class="col-sm-10">
