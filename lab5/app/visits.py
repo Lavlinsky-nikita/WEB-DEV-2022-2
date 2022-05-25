@@ -86,4 +86,17 @@ def users_stat():
 
 @bp.route('/stats/pages')
 def pages_stat():
-    render_template('visits/pages_stat.html')
+    query = ('SELECT visit_logs.path, COUNT(*) AS count FROM visit_logs GROUP BY visit_logs.path ORDER BY count DESC; ')
+    with mysql.connection.cursor(named_tuple=True) as cursor:
+        cursor.execute(query)
+        records = cursor.fetchall()
+
+    if request.args.get('download_csv'):
+        f = generate_report(records)
+        filename = datetime.datetime.now().strftime('%d_%m_%Y_%H_%M_%S') + '_users_stat.csv'
+        # mimetype - если не укажем то автоматически будет определять расширение
+        # as_attachment - позволяет указать будет ли браузер предлагать скачать(куда сохранить), или попытается открыть сам(True - скачивался)
+        # attachment_filename - имя файла 
+        return send_file(f, mimetype='text/csv', as_attachment=True, attachment_filename=filename)
+
+    return render_template('visits/pages_stat.html', records=records)
