@@ -3,6 +3,7 @@ import io
 import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file
 from app import mysql
+from auth import init_login_manager, bp as auth_bp, chech_rights
 
 
 bp = Blueprint('visits', __name__, url_prefix='/visits')
@@ -60,6 +61,7 @@ def logs():
 
 # Статистика по пользователям
 @bp.route('/stats/users')
+@chech_rights('assign_role')
 def users_stat():
     # COUNT (*) - посчитает количество строк не равных 0
     # GROUP BY - берем уникальные значения(visit_logs.user_id), записи с одинаковым значением образуют группы
@@ -84,7 +86,9 @@ def users_stat():
 
     return render_template('visits/users_stat.html', records=records)
 
+
 @bp.route('/stats/pages')
+@chech_rights('assign_role')
 def pages_stat():
     query = ('SELECT visit_logs.path, COUNT(*) AS count FROM visit_logs GROUP BY visit_logs.path ORDER BY count DESC; ')
     with mysql.connection.cursor(named_tuple=True) as cursor:

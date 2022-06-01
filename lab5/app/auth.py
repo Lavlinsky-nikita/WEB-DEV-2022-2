@@ -4,6 +4,9 @@ from app import mysql, app
 from users_policy import UserPolicy
 import functools 
 
+# Создание BP
+# url_prefix - указываем префикс который будет указа в BP
+# При использовании route из BP добавляется название модуля /auth
 bp=Blueprint('auth', __name__, url_prefix='/auth')
 
 class User(UserMixin):
@@ -17,6 +20,7 @@ class User(UserMixin):
     def is_admin(self):
         return app.config.get('ADMIN_ROLE_ID') == self.role_id
 
+    # проверка может ли пользователь выполнять действие 
     def can(self, action, record=None):
         user_policy = UserPolicy(record=record)
         # Проверяет есть ли атрубут с заданным названием (Возвращает объект метода)
@@ -25,14 +29,20 @@ class User(UserMixin):
             return method()
         return False
 
+# Проверка прав пользователя 
 def chech_rights(action):
+    # Создаем свой декаратор 
     def decorator(func):
+        # Заменяет атрибуты функции (wrapper) name doc string, на изначальные параметры функции 
         @functools.wraps(func) 
+        # **kwargs - параметры передаваемые по ключу, *args-позиционные аргументы
         def wrapper(*args, **kwargs):
+            # Получаем пользователя по user_id
             user = load_user(kwargs.get('user_id'))
             if not current_user.can(action, record=user):
                 flash('У вас недостаточно прав для доступа к данной странице.', 'danger')
                 return redirect(url_for('index'))
+            # пробрасываем аргументы в передаваемую функцию
             return func(*args, **kwargs)
         return wrapper 
     return decorator
@@ -72,6 +82,8 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+# Передаем объект приложения
+# Создаем login_manager(требуется объект приложения)
 def init_login_manager(app):
     login_manager= LoginManager()
     login_manager.login_view = 'login'

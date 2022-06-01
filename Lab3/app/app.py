@@ -5,6 +5,7 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 # LoginManager - через этот класс, осуществляем настройку Аутентификации приложения
 # login_manager = LoginManager() - объект класса
 login_manager = LoginManager()
+# login_view - указываем название endpoint страницой ввода пароля для входа, будет перенаправлять, остальные параметры для задачи сообщения
 login_manager.login_view = 'login'
 login_manager.login_message = 'Для доступа к данной страницк необходимо пройти процедуру аутентификации.'
 login_manager.login_message_category = 'warning'
@@ -16,6 +17,18 @@ application = app
 # Этот метод, берет бъект приложения и в качестве атрибута записывает сам себя, чтобы у приложения был доступ к этому объекту
 login_manager.init_app(app)
 
+# Требования Flask login к User Class
+# is_authenticated - проверяет что пользователь был аутентифицирован или нет
+# is_active - является ли аккаунт активным
+# is_anonymous - является ли текущий пользователем не аутентифицирован
+# Метод get_id() - возвращает индефикатор пользователя, который будет храниться в сессии, и будет передаваться в (user_id) 
+
+# UserMixin - базовый класс, предоставляет реализацию базовых методов и свойств 
+
+# Определяем свой метод __init__
+# Вызываем метод __init__ у родительского класса
+# Устанавливаем значение атрибутов:
+# self.id - индефикатор текущего пользователя, id - поумолчанию get(id) берет значение этого атрибута
 class User(UserMixin):
     def __init__(self, user_id, login, password):
         super().__init__()
@@ -23,9 +36,13 @@ class User(UserMixin):
         self.login = login
         self.password = password
 
+# user_loader - декаратор, внутри объекта login_manager запоминаем функцию
 # функция, которая позволяет по индификатору пользователя, который храниться в сессии, вернуть объект соответствующему пользователю 
 # или вернуть None если такого пользователя нет
 # Проходимся по БД, проверяем если индефикатор текущего пользователя есть в БД, то возвращаем объект этого пользователя
+# ** - Вместо того чтобы прописывать все параметры, синтаксис словаря, в котором находятся все параметры (user_id, login, password)
+
+# Функция load_user - вызывается когда получаем запрос, и хотим проверить если такой пользователь
 @login_manager.user_loader
 def load_user(user_id):
     for user in get_users():
@@ -36,6 +53,7 @@ def load_user(user_id):
 # Доступ к секретному ключу
 app.config.from_pyfile('config.py')
 
+# user_id - должен быть строкой, потому что get_id() - возвращает строку а не число 
 def get_users():
     return [{'user_id': '1', 'login': 'user', 'password': 'qwerty'}]
 
@@ -52,7 +70,14 @@ def visits():
         session['visits_count'] += 1
     return render_template('visits.html')
 
+ 
 
+# Извлекам значение с помощью request, из формы берем значение по ключам (login,password) и проверяем значения(наш ли это пользователь)
+# login_user - обновление данных сесси и запомнить что пользователь залогинился
+# при вызове берется индифекатор текущего пользователя,  
+# redirect чтобы перенаправить на страницу 
+
+# Обработка параметра next_, чтобы нас не редиректило на страницу login из-за login_manager.login_view 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -68,11 +93,13 @@ def login():
         flash('Введенны неверные логин и/или пароль.', 'danger')
     return render_template('login.html')
 
+# Удаляем из сессии данные о текущем пользовате 
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('index'))
 
+# login_required - декараток который проверяет аутентификацирован пользователь или нет
 @app.route('/secret_page')
 @login_required
 def secret_page():

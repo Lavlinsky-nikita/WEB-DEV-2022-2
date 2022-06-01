@@ -2,8 +2,10 @@
 
 {% block content %}
 
+<!--container-fluid так как мы используем row  -->
 <form class="container-fluid mt-5" method="POST" style="max-width: 20rem;" >
     <div class="form-floating mb-3">
+        <!-- autocomplete="off" - чтобы не выводились подсказки, name - без него не будут отправляться данные на сервер  -->
         <input autocomplete="off" type="text" class="form-control" id="login" name="login" placeholder="login" value="{{ request.form.login }}" required >
         <label for="login">Логин</label>
     </div>

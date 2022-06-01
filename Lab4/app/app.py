@@ -18,12 +18,15 @@ login_manager.init_app(app)
 
 app.config.from_pyfile('config.py')
 
+# mysql - объект для установления соединения
 mysql = MySQL(app)
 
 # Параметры которые необходимо извлекать из запроса при создании пользователя 
 CREATE_PARAMS = ['login','password','first_name','last_name','middle_name', 'role_id']
+# Параметры которые необходимо извлекать из запроса при редактировании пользователя 
 UPDATE_PARAMS = ['first_name', 'last_name', 'middle_name', 'role_id']
 
+# Функция для извлечения параметра, возвращет словарь 
 def request_params(params_list):
     params ={}
     for param_name in params_list:
@@ -31,6 +34,7 @@ def request_params(params_list):
         params[param_name]=request.form.get(param_name) or None
     return params
 
+# Функция загружающая все роли имеющиеся в базе
 def load_roles():
     with mysql.connection.cursor(named_tuple=True) as cursor:
         cursor.execute('SELECT id, name FROM roles;')
@@ -43,12 +47,20 @@ class User(UserMixin):
         self.id = user_id
         self.login = login
 
-
+# mysql.connection - вернет объект соединения, cursor - создаст cursor(as cursor)
+# cursor.execute - запрос в БД, WHERE id=%s - где индефикатор равен тому, который передан в эту функцию
+# Передаем индефикатор в виде tuple (user_id,) запятая - для так как у нас tuple
+# Результат будет доступен через cursor
+# fetchone() - вернет единственную запись в виде tuple, если результата нет вернет None
+# fetchall() - вернет все записи запроса в виде списка
+# fetchmany(10) - по частям, сколько записей хотим получить
+# named_tuple=True - записи из таблички будут не в виде tuple, а как именнованный tuple (позволяет создавать подкласы стандартного tuple, к полям котогого можно обращаться по названию, id-например)
 @login_manager.user_loader
 def load_user(user_id):
     with mysql.connection.cursor(named_tuple=True) as cursor:
         cursor.execute('SELECT * FROM users WHERE id=%s;', (user_id,))
         db_user=cursor.fetchone()
+    # Если пользователь найден создаем его
     if db_user:
         return User(user_id=db_user.id, login=db_user.login) 
     return None
@@ -66,11 +78,14 @@ def login():
         login_ = request.form.get('login')
         password = request.form.get('password')
         remember_me = request.form.get('remember_me') == 'on'
+        # Запрос, SHA2(%s, 256)- для сопоставления пароля, %s - пароль, 256=длина
         with mysql.connection.cursor(named_tuple=True) as cursor:
             cursor.execute(
                 'SELECT * FROM users WHERE login=%s AND password_hash=SHA2(%s, 256);', 
+                # подставляем значения в виде tuple
                 (login_, password))
             db_user=cursor.fetchone()
+        # Проверка, логиним и выводим сообщение
         if db_user:
             login_user(User(user_id=db_user.id, login=db_user.login),
                         remember=remember_me)
@@ -85,26 +100,36 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+# 
 @app.route('/users')
 def users():
     with mysql.connection.cursor(named_tuple=True) as cursor:
+        # 
         # LEFT JOIN - созранятся все записи даже если у них нет роли 
         cursor.execute('SELECT users.*, roles.name AS role_name FROM users LEFT JOIN roles ON users.role_id = roles.id;')
         users = cursor.fetchall()
     return render_template('users/index.html', users=users)
+
+# @login_required - ограничение доступа для неавторизованных пользователей
 
 @app.route('/users/new')
 @login_required
 def new():
     return render_template('users/new.html', user={}, roles=load_roles())
 
+
+
 @app.route('/users/create', methods=['POST'])
 @login_required
 def create():
+    # Извлечение параметров
     params = request_params(CREATE_PARAMS)
+    # Преобразоавние к int 
     params['role_id'] = int(params['role_id']) if params['role_id'] else None
     with mysql.connection.cursor(named_tuple=True) as cursor:
         try:
+            # INSERT вставляет новые записи в таблицу
+            #  %(login)s - указываем конкретные значения из словаря, куда хотим вставить
             cursor.execute(
                 ('INSERT INTO users (login, password_hash, last_name, first_name, middle_name, role_id)'
                 'VALUES (%(login)s, SHA2(%(password)s, 256), %(last_name)s, %(first_name)s, %(middle_name)s, %(role_id)s);'),
@@ -122,6 +147,7 @@ def create():
     return redirect(url_for('users'))
 
 # передаем индефикатор как часть урла, подставляться в user_id и обязательно int
+# Всегда будет GET запрос
 @app.route('/users/<int:user_id>')
 def show(user_id):
     with mysql.connection.cursor(named_tuple=True) as cursor:
@@ -142,9 +168,10 @@ def edit(user_id):
 def update(user_id):
     params = request_params(UPDATE_PARAMS)
     params['role_id'] = int(params['role_id']) if params['role_id'] else None
+    # для того чтобы передать данные в виде словаря
     params['id'] = user_id
     with mysql.connection.cursor(named_tuple=True) as cursor:
-        try: 
+        try:
             cursor.execute(
                 ('UPDATE users SET last_name=%(last_name)s, first_name=%(first_name)s, ' 
                 'middle_name=%(middle_name)s, role_id=%(role_id)s WHERE id = %(id)s;'), params)

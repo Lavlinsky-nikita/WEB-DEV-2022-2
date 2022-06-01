@@ -12,13 +12,14 @@ app.config.from_pyfile('config.py')
 
 mysql = MySQL(app)
 
-# Импорт здесь должен быть после mysql = MySQL(app)
+# Импорт здесь должен быть после mysql = MySQL(app), если бы он был сверху, mysql не был инициализирован
 from auth import init_login_manager, bp as auth_bp, chech_rights
 
 from visits import bp as visits_bp
 
-
+# Вызов чтобы инициализировать объект login_manager
 init_login_manager(app)
+# Регистрируем BP в приложение
 app.register_blueprint(auth_bp)
 app.register_blueprint(visits_bp)
 
@@ -78,6 +79,8 @@ def users():
         users = cursor.fetchall()
     return render_template('users/index.html', users=users)
 
+# можно исользовать в любом месте так как он не изменяет исходную функцию
+# Сначала login_required, затем chech_rights, потому что при вызове функции идет сверху вниз(а пременяются снизу вверх)
 @app.route('/users/new')
 @login_required
 @chech_rights('create')
