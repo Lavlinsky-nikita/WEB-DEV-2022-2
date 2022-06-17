@@ -40,8 +40,9 @@ def generate_post(i):
 
 posts_list = sorted([generate_post(i) for i in range(5)], key=lambda p: p['date'], reverse=True)
 
+#  Декораторы — это, по сути, "обёртки", которые дают нам возможность изменить поведение функции, не изменяя её код
 # @app.route('/') - декаратор с методом роут принимает шаблон пути 
-# index() -  view function? обработчик которая обрабатывает запрос, поторый поступил, хранятся в app 
+# index() -  view functio? обработчик которая обрабатывает запрос, поторый поступил, хранятся в app 
 @app.route('/')
 def index():
     return render_template('index.html')

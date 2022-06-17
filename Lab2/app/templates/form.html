@@ -10,7 +10,7 @@
 
 <form  method="post" class="card-body">
     <div class="mb-3 card-text">
-    <input type="tel" class="form-control {% if 'error' in context %}is-invalid{% endif %}" name="number" required>
+    <input type="tel" class="form-control {% if 'error' in context %}is-invalid{% endif %}" name="number" value="{{ request.form['number'] }}" required>
     {% if 'error' in context %}
     <div class="invalid-feedback">
         {{ context['error'] }}

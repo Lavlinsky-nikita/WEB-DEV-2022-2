@@ -141,6 +141,7 @@ def update(user_id):
         del params['role_id']
     with mysql.connection.cursor(named_tuple=True) as cursor:
         try: 
+            # Список значение через запятую, список значений которые мы хотим подставить, форматируем 
             cursor.execute((
                 f"UPDATE users SET {', '.join(['{0}=%({0})s'.format(k) for k, _ in params.items() if k != 'id'])} " 
                 'WHERE id = %(id)s;'), params)
