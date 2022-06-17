@@ -261,3 +261,44 @@ def delete(user_id):
             return redirect(url_for('users'))
     flash("Пользователь был успешно удалён!", 'success')
     return redirect(url_for('users'))
+
+@app.route('/chenge_password', methods=['POST', 'GET'])
+def chenge_password():   
+    if request.method == 'GET':
+        return render_template('chenge_password.html')
+    else:
+        now_pass = request.form.get('nowPassword')
+        byte = bytes(now_pass, encoding = 'utf-8')
+        print(hashlib.sha256(byte).hexdigest())
+        with mysql.connection.cursor(named_tuple=True) as cursor:
+            cursor.execute('SELECT password_hash FROM users WHERE id=%s;', (current_user.get_id(), ))
+            response = cursor.fetchone()
+            print(response.password_hash)
+        if hashlib.sha256(byte).hexdigest() == response.password_hash:
+            new_pass = request.form.get('newPassword')
+            password_error_list = getPassErrors(new_pass)
+            print(password_error_list)
+            if password_error_list:
+                return render_template('chenge_password.html', password_error_list=password_error_list)
+            repeat_pass = request.form.get('repeatPassword')
+            if new_pass == repeat_pass:
+                if now_pass != new_pass:
+                    with mysql.connection.cursor(named_tuple=True) as cursor:
+                        try:
+                            cursor.execute(('UPDATE users SET PASSWORD_HASH=SHA2(%s, 256) WHERE id=%s;'), (new_pass, current_user.get_id(), ))
+                            mysql.connection.commit()
+                        except connector.Error:
+                            flash('Ну удалось изменить пароль!', 'danger')
+                            return redirect(url_for('chenge_password'))
+                    flash('Пароль был успешно иизменён!', 'success')
+                    return redirect(url_for('index'))
+                else:
+                    flash('Старый и новый пароли не должны совпадать', 'danger')
+                    return redirect(url_for('chenge_password'))
+            else:
+                flash('Пароли должны совпадать', 'danger')
+                return redirect(url_for('chenge_password'))
+        else:
+            flash('Неверный пароль', 'danger')
+            return redirect(url_for('chenge_password'))
+
