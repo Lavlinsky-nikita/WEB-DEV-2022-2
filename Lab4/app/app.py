@@ -3,6 +3,8 @@ from click import password_option
 from flask import Flask, render_template, session, request, redirect, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
 from mysql_db import MySQL
+import re 
+import hashlib
 import mysql.connector as connector
 
 login_manager = LoginManager()
