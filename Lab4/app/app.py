@@ -26,6 +26,61 @@ CREATE_PARAMS = ['login','password','first_name','last_name','middle_name', 'rol
 # Параметры которые необходимо извлекать из запроса при редактировании пользователя 
 UPDATE_PARAMS = ['first_name', 'last_name', 'middle_name', 'role_id']
 
+def getPassErrors(password):
+    password_error_list = set()
+    if password==None:
+        password_error_list.add('Поле не может быть пустым')
+    else:
+        if len(password) > 128 or len(password) < 8 and password ==None:
+            password_error_list.add('Пароль должен быть длинной больше 8 и меньше 128 символов')
+        if not any(c.islower() for c in password):
+            password_error_list.add('Пароль должен содержать строчную букву')
+        if not any(c.isupper() for c in password):
+            password_error_list.add('Пароль должен содержать заглавную букву')
+        if not any(c.isdigit() for c in password):
+            password_error_list.add('Пароль должен содержать цифру')
+        for i in password:
+            if i.isalpha():
+                if not (bool(re.search('[а-яА-Я]', i)) or bool(re.search('[a-zA-Z]', i))):
+                    password_error_list.add('Допустимы только латинские или кириллические буквы')
+            elif i.isdigit():
+                pass
+            else:
+                if i == ' ':
+                    password_error_list.add('Недопустимо использовать пробел')
+                if i not in '''~ ! ? @ # $ % ^ & * _ - + ( ) [ ] { } > < / \ | " ' . , : ;'''.split():
+                    password_error_list.add('Недопустимые символы')
+    if len(password_error_list) != 0:
+        return password_error_list
+    
+def getLoginErrors(login):
+    login_error_list = set()
+    if login==None:
+        login_error_list.add('Поле не может быть пустым')
+    else:
+        if len(login) < 5:
+            login_error_list.add('Логин должен содержать больше 5 символов')
+        for i in login:
+            if not (bool(re.search('[a-zA-Z]', i)) or i.isdigit()):
+                login_error_list.add('Допустимы только латинские буквы и цифры')
+    if len(login_error_list) != 0:
+        return login_error_list
+
+def getLastNameErrors(last_name):
+    last_name_error_list = set()
+    if last_name==None:
+        last_name_error_list.add('Поле не может быть пустым')
+    if len(last_name_error_list) != 0:
+        return last_name_error_list
+
+def getFirstNameErrors(first_name):
+    first_name_error_list = set()
+    if first_name==None:
+        first_name_error_list.add('Поле не может быть пустым')
+    if len(first_name_error_list) != 0:
+        return first_name_error_list
+
+
 # Функция для извлечения параметра, возвращет словарь 
 def request_params(params_list):
     params ={}
@@ -126,6 +181,18 @@ def create():
     params = request_params(CREATE_PARAMS)
     # Преобразоавние к int 
     params['role_id'] = int(params['role_id']) if params['role_id'] else None
+    password_error_list = getPassErrors(params.get('password'))
+    login_error_list = getLoginErrors(params.get('login'))
+    last_name_error_list = getLastNameErrors(params.get('last_name'))
+    first_name_error_list = getFirstNameErrors(params.get('first_name'))
+    if password_error_list or login_error_list or last_name_error_list or first_name_error_list:
+        print(password_error_list)
+        print(login_error_list)
+        print(last_name_error_list)
+        print(first_name_error_list)
+        flash('Введены некоректные данные. Повторите попытку', 'danger')
+        return render_template('users/new.html', user=params, roles=load_roles(), password_error_list=password_error_list,
+            login_error_list=login_error_list, last_name_error_list=last_name_error_list, first_name_error_list=first_name_error_list)
     with mysql.connection.cursor(named_tuple=True) as cursor:
         try:
             # INSERT вставляет новые записи в таблицу

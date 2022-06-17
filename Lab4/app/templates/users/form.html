@@ -10,13 +10,15 @@
               <label for="login" class="col-sm-2 col-form-label">Логин</label>
               <div class="col-sm-10">
                 <input type="text" class="form-control" name="login" id="login" value="{{ user.login or '' }}">
-              <div id="validationServerUsernameFeedback" class="invalid-feedback">
+              
+                <div id="validationServerUsernameFeedback" class="invalid-feedback">
                 {% if login_error_list %}
                   {% for error in login_error_list %}
                     {{ error }}<br>
                   {% endfor %}
                 {% endif %}
-              </div>
+                </div>
+              
               </div>
           </div>
 
