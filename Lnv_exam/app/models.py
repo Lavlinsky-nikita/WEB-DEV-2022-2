@@ -21,7 +21,6 @@ class Book(db.Model):
     publishing_house = db.Column(db.String(100), nullable=False)
     author = db.Column(db.String(100), nullable=False)
     page_volume = db.Column(db.Integer, nullable=False)
-
     genres = db.relationship('Genre', secondary=book_genres,
     backref=db.backref('books'))
 

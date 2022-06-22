@@ -23,18 +23,8 @@ migrate = Migrate(app, db)
 
 from auth import bp as auth_bp, init_login_manager
 
-
 app.register_blueprint(auth_bp)
-
 
 init_login_manager(app)
 
 from models import *
-
-@app.route('/')
-def index():
-    categories = []
-    return render_template(
-        'index.html', 
-        categories=categories,
-    )
