@@ -9,11 +9,6 @@ application = app
 
 app.config.from_pyfile('config.py')
 
-from auth import bp as auth_bp, init_login_manager
-app.register_blueprint(auth_bp)
-
-init_login_manager(app)
-
 convention = {
     "ix": 'ix_%(column_0_label)s',
     "uq": "uq_%(table_name)s_%(column_0_name)s",
@@ -26,7 +21,15 @@ metadata = MetaData(naming_convention=convention)
 db = SQLAlchemy(app, metadata=metadata)
 migrate = Migrate(app, db)
 
-from models import Book, Genre, book_genres
+from auth import bp as auth_bp, init_login_manager
+
+
+app.register_blueprint(auth_bp)
+
+
+init_login_manager(app)
+
+from models import *
 
 @app.route('/')
 def index():
