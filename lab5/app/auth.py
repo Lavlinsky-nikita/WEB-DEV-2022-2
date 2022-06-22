@@ -47,6 +47,8 @@ def chech_rights(action):
         return wrapper 
     return decorator
     
+# Метод can, chech_rights(action), SQL запрос
+# 4 валиция, сообщение для каждой ошибки отдельно
 
 def load_user(user_id):
     with mysql.connection.cursor(named_tuple=True) as cursor:
