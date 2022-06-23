@@ -70,7 +70,7 @@ class User(db.Model, UserMixin):
     last_name = db.Column(db.String(100), nullable=False)
     first_name = db.Column(db.String(100), nullable=False)
     middle_name = db.Column(db.String(100))
-    role = db.Column(db.Integer, db.ForeignKey('roles.role_name'))
+    role = db.Column(db.Integer, db.ForeignKey('roles.id'))
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
