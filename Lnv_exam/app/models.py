@@ -43,7 +43,7 @@ class Image(db.Model):
     file_name = db.Column(db.String(100), nullable=False)
     mime_type = db.Column(db.String(100), nullable=False)
     md5_hash = db.Column(db.String(100), nullable=False, unique=True)
-    book_img = db.Column(db.Integer, db.ForeignKey('books.id'))
+    book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
 
     def __repr__(self):
         return '<Image  %r>' % self.file_name
@@ -52,8 +52,8 @@ class Reviews(db.Model):
     __tablename__ = 'reviews'
     
     id = db.Column(db.Integer, primary_key=True)
-    book_review = db.Column(db.Integer, db.ForeignKey('books.id'))
-    user = db.Column(db.Integer, db.ForeignKey('users.id'))
+    book_review = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
+    user = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     rating_sum = db.Column(db.Float, nullable=False, default=0)
     rating_num = db.Column(db.Float, nullable=False, default=0)
     text = db.Column(db.Text, nullable=False)
@@ -77,7 +77,7 @@ class User(db.Model, UserMixin):
     last_name = db.Column(db.String(100), nullable=False)
     first_name = db.Column(db.String(100), nullable=False)
     middle_name = db.Column(db.String(100))
-    role = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    role = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
