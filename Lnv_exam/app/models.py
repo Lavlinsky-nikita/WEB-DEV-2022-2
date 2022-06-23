@@ -54,10 +54,17 @@ class Reviews(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     book_review = db.Column(db.Integer, db.ForeignKey('books.id'))
     user = db.Column(db.Integer, db.ForeignKey('users.id'))
-    grade = db.Column(db.Integer, nullable=False)
+    rating_sum = db.Column(db.Float, nullable=False, default=0)
+    rating_num = db.Column(db.Float, nullable=False, default=0)
     text = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, server_default=sa.sql.func.now())
     
+    @property
+    def rating(self):
+        if self.rating_num > 0:
+            return self.rating_sum / self.rating_num
+        return 0
+
     def __repr__(self):
         return '<Reviews %r>' % self.user
 

@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, send_file, abort, send_from_directory
+from flask import Flask, render_template, request
 from sqlalchemy import MetaData
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -28,3 +28,13 @@ app.register_blueprint(auth_bp)
 init_login_manager(app)
 
 from models import *
+
+PER_PAGE = 10
+
+@app.route('/')
+def index():
+    books = Book.query.all()
+    genre = Genre.query.all()
+    return render_template('index.html',
+                            books=books,
+                            genre=genre)
