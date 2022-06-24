@@ -34,7 +34,5 @@ PER_PAGE = 10
 @app.route('/')
 def index():
     books = Book.query.all()
-    genre = Genre.query.all()
     return render_template('index.html',
-                            books=books,
-                            genre=genre)
+                            books=books)

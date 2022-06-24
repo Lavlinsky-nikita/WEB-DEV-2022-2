@@ -22,6 +22,8 @@ Last update          {Last_update}
 Outbound Interface   {Outbound_Interface} 
 '''
 
+# open - открытие файла. ospf.txt - имя файла. r - ружим открытия файла(открыть файл только для чтения)
+
 with open("ospf.txt", "r") as f:
     for line in f:
         ospf_route_list = line.split()

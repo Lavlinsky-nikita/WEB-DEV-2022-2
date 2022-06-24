@@ -15,11 +15,13 @@
                     <div class="d-flex">
                         <h4 class="text-uppercase">{{ book.name }}</h4>
                         <p class="ms-auto rating">
-                            <span>★</span> <span>{# "%.2f" | format(book.rating) #}</span>
+                            <span>★</span> <span>{#  #}</span>
                         </p> 
                         
                     </div>
-                    <p class="text-muted my-3">{{ book.author.full_name }}</p>
+                    <p class="text-muted my-3"> Автор: {{ book.author }}</p>
+                    <p class="text-muted my-3"> Год: {{ book.year }}</p>
+                    <p class="text-muted my-3"> Жанр: {#  #}</p>
                     
                 </div>
             </div>
