@@ -22,8 +22,11 @@ db = SQLAlchemy(app, metadata=metadata)
 migrate = Migrate(app, db)
 
 from auth import bp as auth_bp, init_login_manager
+from books import bp as books_bp
+
 
 app.register_blueprint(auth_bp)
+app.register_blueprint(books_bp)
 
 init_login_manager(app)
 
