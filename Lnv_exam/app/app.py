@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template, request
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData, desc
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
@@ -29,10 +29,10 @@ init_login_manager(app)
 
 from models import *
 
-PER_PAGE = 10
+
 
 @app.route('/')
 def index():
-    books = Book.query.all()
+    books = Book.query.order_by(Book.year.desc()).all()
     return render_template('index.html',
                             books=books)
