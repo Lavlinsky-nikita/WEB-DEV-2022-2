@@ -29,12 +29,16 @@
                 </div>
 
                 <div class="btn-group">
-                    {% if current_user.is_authenticated %}
+                    {% if current_user.is_authenticated%}
                         <a class="btn btn-primary" href="{{ url_for('books.show', book_id=book.id) }}">Просмотр</a>
-                        <a class="btn btn-secondary" href="{{ url_for('books.edit', book_id=book.id) }}">Редактирование</a>
-                        <button type="button" class="btn btn-danger" data-url="{# url_for('books.delete, book_id=book.id') #}" data-bs-toggle="modal" data-bs-target="#delete-user-modal">
-                            Удалить
-                        </button>
+                        {% if current_user.can('edit')%}
+                            <a class="btn btn-secondary" href="{{ url_for('books.edit', book_id=book.id) }}">Редактирование</a>
+                        {% endif %}
+                        {% if current_user.can('delete')%}
+                            <button type="button" class="btn btn-danger" data-url="{# url_for('books.delete, book_id=book.id') #}" data-bs-toggle="modal" data-bs-target="#delete-user-modal">
+                                Удалить
+                            </button>
+                        {% endif %}
                     {% endif %}
                 </div>
 
@@ -46,7 +50,7 @@
         {{ render_pagination(pagination, request.endpoint) }}
     </div>
 
-    {% if current_user.is_authenticated %}
+    {% if current_user.is_authenticated and current_user.can('create') %}
         <div class="text-center my-3">
             <a class="btn btn-lg btn-dark" href="{{ url_for('books.new') }}">Добавить книгу</a>
         </div>
