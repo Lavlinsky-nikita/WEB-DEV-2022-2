@@ -23,14 +23,16 @@
                     <p class="text-muted my-3"> Автор: {{ book.author }}</p>
                     <p class="text-muted my-3"> Год: {{ book.year }}</p>
                     <p class="text-muted my-3"> Жанр:!!! {#  #}</p>
+                    <p class="text-muted my-3"> Количество рецензий:!!! {#  #}</p>
+
                     
                 </div>
 
                 <div class="btn-group">
                     {% if current_user.is_authenticated %}
-                        <a class="btn btn-primary" href="{{ url_for('books.show') }}">Просмотр</a>
-                        <a class="btn btn-secondary" href="{{ url_for('books.edit') }}">Редактирование</a>
-                        <button type="button" class="btn btn-danger" data-url="{# url_for('books.delete'#}" data-bs-toggle="modal" data-bs-target="#delete-user-modal">
+                        <a class="btn btn-primary" href="{{ url_for('books.show', book_id=book.id) }}">Просмотр</a>
+                        <a class="btn btn-secondary" href="{{ url_for('books.edit', book_id=book.id) }}">Редактирование</a>
+                        <button type="button" class="btn btn-danger" data-url="{# url_for('books.delete, book_id=book.id') #}" data-bs-toggle="modal" data-bs-target="#delete-user-modal">
                             Удалить
                         </button>
                     {% endif %}
