@@ -1,7 +1,8 @@
 import os
 import sqlalchemy as sa
 from flask_login import UserMixin
-from app import db
+from app import db, app
+from users_policy import UserPolicy
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -88,6 +89,26 @@ class User(db.Model, UserMixin):
     @property
     def full_name(self):
         return ' '.join([self.last_name, self.first_name, self.middle_name or ''])
+
+    @property
+    def is_admin(self):
+        return app.config.get('ADMIN_ROLE_ID') == self.role
+
+    @property
+    def is_moder(self):
+        return app.config.get('ADMIN_MODER_ID') == self.role
+
+    @property
+    def is_user(self):
+        return app.config.get('ADMIN_USER_ID') == self.role
+
+    def can(self, action):
+        user_policy = UserPolicy()
+        method = getattr(user_policy, action) 
+        if method is not None:
+            return method()
+        return False
+
 
     def __repr__(self):
         return '<users  %r>' % self.login
