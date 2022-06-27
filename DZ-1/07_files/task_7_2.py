@@ -43,7 +43,10 @@ interface Ethernet0/3
 
 file_name = "config_sw1.txt"
 
+# передаем файл как аргумент скрипту
 with open(file_name) as f:
     for line in f:
+        # startswith - начинается с символа
         if not line.startswith("!"):
+            # rstrip() - убирает лишнюю пустую стоку, так как последний элемент списка - пустая строка
             print(line.rstrip())

@@ -1,7 +1,7 @@
 
 from click import password_option
 from flask import Flask, render_template, session, request, redirect, url_for, flash
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from mysql_db import MySQL
 import re 
 import hashlib
@@ -33,7 +33,7 @@ def getPassErrors(password):
     if password==None:
         password_error_list.add('Поле не может быть пустым')
     else:
-        if len(password) > 128 or len(password) < 8 and password ==None:
+        if len(password) > 128 or len(password) < 8:
             password_error_list.add('Пароль должен быть длинной больше 8 и меньше 128 символов')
         if not any(c.islower() for c in password):
             password_error_list.add('Пароль должен содержать строчную букву')
@@ -290,7 +290,7 @@ def chenge_password():
                             cursor.execute(('UPDATE users SET PASSWORD_HASH=SHA2(%s, 256) WHERE id=%s;'), (new_pass, current_user.get_id(), ))
                             mysql.connection.commit()
                         except connector.Error:
-                            flash('Ну удалось изменить пароль!', 'danger')
+                            flash('Не удалось изменить пароль!', 'danger')
                             return redirect(url_for('chenge_password'))
                     flash('Пароль был успешно иизменён!', 'success')
                     return redirect(url_for('index'))

@@ -40,6 +40,7 @@
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 
 """
+# Создаем пустой список
 mac_table = []
 
 with open("CAM_table.txt", "r") as conf:
@@ -47,7 +48,9 @@ with open("CAM_table.txt", "r") as conf:
         words = line.split()
         if words and words[0].isdigit():
             vlan, mac, type, interface = words
+            # в пустой список добавляем нужные параметры, и номер преобразуем в число из строки
             mac_table.append([int(vlan), mac, interface])
 
-for vlan, mac, intf in sorted(mac_table):
+# sorted возвращает новый отсортированный список(возвращает новый список)
+for vlan, mac, interface in sorted(mac_table):
     print(f"{vlan:<10}{mac:20}{interface}")

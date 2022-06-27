@@ -23,6 +23,8 @@
 with open("CAM_table.txt") as conf:
     for line in conf:
         words = line.split()
+        # Если есть список(строка) проверяем что первый элемент - число
         if words and words[0].isdigit():
-            vlan, mac, _, interface = words
+            # Разбиваем список по элементам и лишний просто не выводим
+            vlan, mac, type, interface = words
             print(f"{vlan:10}{mac:20}{interface}")

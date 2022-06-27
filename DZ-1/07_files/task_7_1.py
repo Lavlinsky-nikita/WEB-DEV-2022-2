@@ -25,11 +25,15 @@ Outbound Interface   {Outbound_Interface}
 # open - открытие файла. ospf.txt - имя файла. r - ружим открытия файла(открыть файл только для чтения)
 
 with open("ospf.txt", "r") as f:
-    for line in f:
-        ospf_route_list = line.split()
-        result = {'Prefix': ospf_route_list[1],
+  # По каждой строчке
+  for line in f:
+    # Разделяем строчку по пробелу
+    ospf_route_list = line.split()
+    # помещаем в переменную значение строк
+    # strip - избавиться от символов  
+    result = {'Prefix': ospf_route_list[1],
           'AD_Metric': ospf_route_list[2].strip("[]"),
           'Next_Hop': ospf_route_list[4].strip(','),
           'Last_update': ospf_route_list[5].strip(','),
           'Outbound_Interface': ospf_route_list[6]}
-        print(template.format(**result))
+  print(template.format(**result))

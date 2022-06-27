@@ -22,7 +22,10 @@ file_name = "config_sw1.txt"
 
 with open(file_name) as f:
     for line in f:
+        # Разделяем строчку по пробелу
         word_from_file = line.split()
+        # берем из списка только пересекающиеся "слова" (знаки, да вообще все)
         word_from_file_ingnore = set(word_from_file) & set(ignore)
+        # Проверка что строчка не начинается с ! и не имеет символы из игнора
         if not line.startswith("!") and not word_from_file_ingnore:
             print(line.rstrip())
