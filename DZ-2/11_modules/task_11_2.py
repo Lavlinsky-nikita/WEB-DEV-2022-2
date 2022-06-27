@@ -38,6 +38,7 @@ infiles = [
     "sh_cdp_n_r3.txt",
 ]
 
+
 def create_network_map(filenames):
     network = {}
     for filename in filenames:

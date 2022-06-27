@@ -49,6 +49,7 @@ trunk_config = {
 }
 
 def generate_trunk_config(intf_vlan_mapping, trunk_template):
+    # создаем не список а словарь (имеет доспуп по ключу)
     access = {}
     for interface, vlan in intf_vlan_mapping.items():
         access[interface] = []
@@ -56,6 +57,7 @@ def generate_trunk_config(intf_vlan_mapping, trunk_template):
         vlan = vlan.strip('[]')
         for part in trunk_template:
             if part.endswith("allowed vlan"):
+                # В ключ с интерфейсом добавляем значение настроек
                 access[interface].append(f'{part} {vlan}')
             else: 
                 access[interface].append(part)

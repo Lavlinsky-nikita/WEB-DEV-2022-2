@@ -44,6 +44,7 @@ port_security_template = [
 
 access_config = {"FastEthernet0/12": 10, "FastEthernet0/14": 11, "FastEthernet0/16": 17}
 
+# psecurity = None по умолчанию None, чтобы не сломать предыдущую проверку
 def generate_access_config(intf_vlan_mapping, access_template, psecurity = None):
     access = []
     for interface, vlan in intf_vlan_mapping.items():
@@ -53,10 +54,9 @@ def generate_access_config(intf_vlan_mapping, access_template, psecurity = None)
                 access.append(f'{part} {vlan}')
             else: 
                 access.append(part)
+        # если передали параметр psecurity(настроен) дабавляем к списку переданный список
         if psecurity is not None:
             access += psecurity
-            # for part_security in psecurity:
-            #     access.append(part_security)
     return access
     """
     intf_vlan_mapping - словарь с соответствием интерфейс-VLAN такого вида:

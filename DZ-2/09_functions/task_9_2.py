@@ -64,8 +64,10 @@ trunk_config_2 = {
 def generate_trunk_config(intf_vlan_mapping, trunk_template):
     access = []
     for interface, vlan in intf_vlan_mapping.items():
+        # Записываем полученный интерфейс 
         access.append(f'interface {interface}')
-        vlan = str(vlan)
+        # преобразуем vlan к тсроке из списка и убираем скобки
+        vlan = str(vlan)    
         vlan = vlan.strip('[]')
         for part in trunk_template:
             if part.endswith("allowed vlan"):

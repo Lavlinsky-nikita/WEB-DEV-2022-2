@@ -40,8 +40,11 @@ import ipaddress
 def convert_ranges_to_ip_list(ip_addresses):
     ip_list = []
     for ip_address in ip_addresses:
+        # Если в ip есть диапазон 
         if "-" in ip_address:
+            # падаметры диапазона
             start, stop = ip_address.split("-")
+            print(start, stop)
             if "." not in stop:
                 stop = ".".join(start.split(".")[:-1] + [stop])
             start = ipaddress.ip_address(start)

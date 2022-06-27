@@ -64,13 +64,18 @@ access_config_2 = {
     "FastEthernet0/09": 107,
 }
 
-
+# 
 def generate_access_config(intf_vlan_mapping, access_template):
     access = []
+    # items - берет ключ и значени
+    # Берем каждый элемент(ключ значение)
     for interface, vlan in intf_vlan_mapping.items():
+        # добавляем в список название интерфейса
         access.append(f'interface {interface}')
         for part in access_template:
+            # endswith - проверка на что заканчивается (True/False)
             if part.endswith("access vlan"):
+                # в список подставляем access vlan и номер vlan
                 access.append(f'{part} {vlan}')
             else: 
                 access.append(part)

@@ -43,14 +43,20 @@ def parse_cdp_neighbors(command_output):
     и с файлами и с выводом с оборудования.
     Плюс учимся работать с таким выводом.
     """
+    # создаем словарь
     result = {}
+    # разделение по строкам
     for line in command_output.split("\n"):
-        line = line.strip()
+        # Расделяем строки по элементам
         colum = line.split()
         if ">" in line:
+            # Разделяем по > и берем первый(название хоста)
             hostname = line.split(">")[0]
+        # Отбрасываем 1 строку(команду) и чтобы 4 элемент был числом(Holdtme) (4 послежние строчки)
         elif len(colum) >= 5 and colum[3].isdigit():
+            # other - Holdtme, Capability,Platform (все между l_int_num и r_int) 
             r_host, l_int, l_int_num, *other, r_int, r_int_num = colum
+            # заполянем словарь параметрами(ключ значение): имя, порт(сумма т.к 2 элемента в один)
             result[(hostname, l_int + l_int_num)] = (r_host, r_int + r_int_num)
     return result
 

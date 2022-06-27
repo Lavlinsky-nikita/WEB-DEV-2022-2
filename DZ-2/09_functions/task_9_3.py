@@ -28,15 +28,20 @@ from os import access
 
 
 def get_int_vlan_map(config_filename):
+    # два словаря 
     access_vlan = {}
     trunk_vlan = {}
     with open(config_filename) as f:
         for line in f:
+            # rstrip - убираем пустые строки
             line = line.rstrip()
+            # Если строка начинается с ... то из этой строчки берем 2 слово(интерфейс)
             if line.startswith("interface"):
                 interface = line.split()[1]
+            # если access vlan в строчке то берем последний элемент из строчки(сам номер интерфейса)
             elif "access vlan" in line:
                 access_vlan[interface] = int(line.split()[-1])
+            # если trunk allowed в строчке. берем номера интерфейсы в виде списка
             elif "trunk allowed" in line:
                 trunk_vlan[interface] = [int(vlan) for vlan in line.split()[-1].split(',')]
         return access_vlan, trunk_vlan

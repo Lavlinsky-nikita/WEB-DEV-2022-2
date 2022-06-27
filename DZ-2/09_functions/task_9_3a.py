@@ -31,16 +31,20 @@ def get_int_vlan_map(config_filename):
     with open(config_filename) as f:
         for line in f:
             line = line.rstrip()
+            # если начинается с interface Fast записываем номер интерфейса
             if line.startswith("interface Fast"):
                 interface = line.split()[1]
+                # В словарь с названием интерфейса(ключ) записываем параметр VLAN 1(перезапишем потом если будет access vlan )
                 access_vlan[interface] = 1
             elif "access vlan" in line:
                 access_vlan[interface] = int(line.split()[-1])
             elif "trunk allowed" in line:
                 trunk_vlan[interface] = [int(vlan) for vlan in line.split()[-1].split(',')]
+                # удаляем ключ значение из access_vlan 
                 del access_vlan[interface]
         return access_vlan, trunk_vlan
 
+# Логика такая: сначала в access vlan записываем все, затем выпиливаем trunk_vlan, чтобы обработать VLAN 1
 
 x = get_int_vlan_map("config_sw2.txt")
 print(x)

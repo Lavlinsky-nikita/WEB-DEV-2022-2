@@ -18,16 +18,23 @@ IP-адрес считается доступным, если выполнени
 Ограничение: Все задания надо выполнять используя только пройденные темы.
 """
 import subprocess
+# Модуль subprocess возвращает результат команды в виде байт:
+# Если указать его при вызове функции run, результат будет получен в виде строки
+#  Если нужно получить результат выполнения команды, надо добавить аргумент stdout и указать ему значение subprocess.PIPE:
+# если ее не будет возникнет ошибка: Доступ запрещен. Для параметра -c требуются права администратора.
+
 
 
 def ping_ip_addresses(ip_addresses):
+    # писки доступных и недоступных IP-адресов
     reachable = []
     unreachable = []
 
     for ip in ip_addresses:
         result = subprocess.run(
-            ["ping", "-c", "3", ip], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            ["ping", "-c", "3", ip], stdout=subprocess.PIPE
         )
+        # Если пинг удался
         if result.returncode == 0:
             reachable.append(ip)
         else:
