@@ -163,6 +163,7 @@ def users():
     with mysql.connection.cursor(named_tuple=True) as cursor:
         # 
         # LEFT JOIN - созранятся все записи даже если у них нет роли 
+        ## Выбираем всех пользователей как столбик role_name из таблицы пользователи и соединяем с таблицей роли по ID пользователя
         cursor.execute('SELECT users.*, roles.name AS role_name FROM users LEFT JOIN roles ON users.role_id = roles.id;')
         users = cursor.fetchall()
     return render_template('users/index.html', users=users)
@@ -199,6 +200,7 @@ def create():
         try:
             # INSERT вставляет новые записи в таблицу
             #  %(login)s - указываем конкретные значения из словаря, куда хотим вставить
+            # Создает нового пользователя в скобках указываются столбцы, VALUES - что вносить в эти столбцы
             cursor.execute(
                 ('INSERT INTO users (login, password_hash, last_name, first_name, middle_name, role_id)'
                 'VALUES (%(login)s, SHA2(%(password)s, 256), %(last_name)s, %(first_name)s, %(middle_name)s, %(role_id)s);'),
@@ -220,6 +222,7 @@ def create():
 @app.route('/users/<int:user_id>')
 def show(user_id):
     with mysql.connection.cursor(named_tuple=True) as cursor:
+        # Выборка одного пользователя по id
         cursor.execute('SELECT * FROM users WHERE id=%s;', (user_id,))
         user=cursor.fetchone()
     return render_template('users/show.html', user=user)
@@ -228,6 +231,7 @@ def show(user_id):
 @login_required
 def edit(user_id):
     with mysql.connection.cursor(named_tuple=True) as cursor:
+        # Выборка одного пользователя по id
         cursor.execute('SELECT * FROM users WHERE id=%s;', (user_id,))
         user = cursor.fetchone()
     return render_template('users/edit.html', user=user, roles=load_roles())
@@ -241,6 +245,7 @@ def update(user_id):
     params['id'] = user_id
     with mysql.connection.cursor(named_tuple=True) as cursor:
         try:
+            # Редактирование записи пользователя по id, params - объект 
             cursor.execute(
                 ('UPDATE users SET last_name=%(last_name)s, first_name=%(first_name)s, ' 
                 'middle_name=%(middle_name)s, role_id=%(role_id)s WHERE id = %(id)s;'), params)
@@ -273,6 +278,7 @@ def chenge_password():
         byte = bytes(now_pass, encoding = 'utf-8')
         print(hashlib.sha256(byte).hexdigest())
         with mysql.connection.cursor(named_tuple=True) as cursor:
+            # Достать хэш пароля по ID пользователя
             cursor.execute('SELECT password_hash FROM users WHERE id=%s;', (current_user.get_id(), ))
             response = cursor.fetchone()
             print(response.password_hash)
@@ -287,6 +293,7 @@ def chenge_password():
                 if now_pass != new_pass:
                     with mysql.connection.cursor(named_tuple=True) as cursor:
                         try:
+                            # Обновление пароля пользователя. 
                             cursor.execute(('UPDATE users SET PASSWORD_HASH=SHA2(%s, 256) WHERE id=%s;'), (new_pass, current_user.get_id(), ))
                             mysql.connection.commit()
                         except connector.Error:
