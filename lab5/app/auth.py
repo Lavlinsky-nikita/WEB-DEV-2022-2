@@ -54,7 +54,7 @@ def chech_rights(action):
             if not current_user.can(action, record=user):
                 flash('У вас недостаточно прав для доступа к данной странице.', 'danger')
                 return redirect(url_for('index'))
-            # пробрасываем аргументы в передаваемую функцию
+            # пробрасываем аргументы в передаваемую функцию, результат выполнения функции
             return func(*args, **kwargs)
         return wrapper 
     return decorator
