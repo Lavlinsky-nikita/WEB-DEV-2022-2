@@ -20,22 +20,34 @@ class User(UserMixin):
     def is_admin(self):
         return app.config.get('ADMIN_ROLE_ID') == self.role_id
 
-    # проверка может ли пользователь выполнять действие 
+    # Метод can возвращает True/False в зависмимости от того, может ли пользовать
+    # выполнить действие или нет 
+    # action- действие пользователя, record-действия связанно с каким-то конкретным 
+    # объектом(необязательное)
     def can(self, action, record=None):
+        # создание политики пользователя, при инициализации передаем record, 
+        # которое было вызванно методом can
         user_policy = UserPolicy(record=record)
-        # Проверяет есть ли атрубут с заданным названием (Возвращает объект метода)
+        # getattr - проверяет есть ли у метода атрибут с заданным названием
+        # объект - user_policy, action - проверяемый атрибут, значение если атрубута нет - None
         method = getattr(user_policy, action, None) 
         if method is not None:
+            # возвращаем то что мы запросили(вызываем), если такой метод обнаружен
             return method()
         return False
 
-# Проверка прав пользователя 
+# Декаратор - это функция которая принимает в качестве аргумента функцию
+# и возвращает функцию
+
+# Функция для проверки прав пользователя 
+# Передаем параметр действия пользователя(action)
 def chech_rights(action):
     # Создаем свой декаратор 
     def decorator(func):
-        # Заменяет атрибуты функции (wrapper) name doc string, на изначальные параметры функции 
+        # Заменяет атрибуты функции (wrapper) name doc string, на изначальные параметры функции
         @functools.wraps(func) 
-        # **kwargs - параметры передаваемые по ключу, *args-позиционные аргументы
+        # wrapper - функция обертка которая добавляет функциональность функции
+        # **kwargs - параметры передаваемые по ключу(Произвольные параметры), *args-позиционные аргументы
         def wrapper(*args, **kwargs):
             # Получаем пользователя по user_id
             user = load_user(kwargs.get('user_id'))
@@ -47,8 +59,6 @@ def chech_rights(action):
         return wrapper 
     return decorator
     
-# Метод can, chech_rights(action), SQL запрос
-# 4 валиция, сообщение для каждой ошибки отдельно
 
 def load_user(user_id):
     with mysql.connection.cursor(named_tuple=True) as cursor:
